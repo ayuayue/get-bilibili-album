@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-//Resp 定义x相应信息结构体
+//Resp 定义响应信息结构体
 type Resp struct {
 	Code    int
 	Msg     string
