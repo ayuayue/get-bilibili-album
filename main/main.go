@@ -110,7 +110,9 @@ func GetSrc(uid int, num int) {
 		// fmt.Println(items)
 		for _, v := range items {
 			//获取每一个picture
-			for _, v1 := range v.Pictures {
+			fmt.Println("正在读取第" + strconv.Itoa(index) + "个相册,共" + strconv.Itoa(num) + "个相册")
+				
+			for k, v1 := range v.Pictures {
 				//读取图片原始二进制数据
 				bin, err := http.Get(v1.ImgSrc)
 				if err != nil {
@@ -125,7 +127,7 @@ func GetSrc(uid int, num int) {
 				//获取图片的后缀,并更改名字重新保存
 				dot := strings.LastIndex(v1.ImgSrc, ".")
 				ext := v1.ImgSrc[dot:]
-				f, err := os.OpenFile(strconv.Itoa(uid)+"/"+strconv.Itoa(index)+ext, os.O_CREATE, 0666)
+				f, err := os.OpenFile(strconv.Itoa(uid)+"/"+strconv.Itoa(index)+"-"+strconv.Itoa(k+1)+ext, os.O_CREATE, 0666)
 				defer f.Close()
 				if err != nil {
 					panic("文件读取失败 >_<!")
@@ -134,10 +136,10 @@ func GetSrc(uid int, num int) {
 				if err != nil {
 					panic("文件写入失败 >_<!")
 				}
-				fmt.Println("正在下载第" + strconv.Itoa(index) + "个图片,共" + strconv.Itoa(num) + "个图片")
-				index++
+			fmt.Println("正在下载第"+strconv.Itoa(index)+"个相册的第" + strconv.Itoa(k+1) + "个图片,共" + strconv.Itoa(len(v.Pictures)) + "个图片")
+			
 			}
-
+			index++
 		}
 
 	} else {
