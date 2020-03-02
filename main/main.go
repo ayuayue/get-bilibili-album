@@ -166,7 +166,8 @@ func GetSrc(uid int, num int) {
 			}
 			index++
 		}
-
+		fmt.Println("下载完成,马上退出 >_<~~")
+		time.Sleep(2*time.Second)
 	} else {
 		panic("相册详情解析失败了呢 >_<!")
 	}
