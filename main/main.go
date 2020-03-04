@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"get-bilibili-album/clear"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -78,15 +79,18 @@ func main() {
 		if err != nil {
 			fmt.Println(err)
 		}
-		num := GetImgNum(user.Uid)
-		// fmt.Println(num)
-		if num != 0 {
-			GetSrc(user.Uid, num)
-			break
+		if user.Uid == 0 || strconv.Itoa(user.Uid) == " " {
+			fmt.Println("uid不能为空或者为0")
+		} else {
+			num := GetImgNum(user.Uid)
+			if num != 0 {
+				GetSrc(user.Uid, num)
+				break
+			}
+			fmt.Println("--------------------------")
+			fmt.Println("该up主还没有上传相册哦 >_<~~")
+			time.Sleep(time.Second * 1)
 		}
-		fmt.Println("--------------------------")
-		fmt.Println("该up主还没有上传相册哦 >_<~~")
-		time.Sleep(time.Second * 2)
 
 	}
 
@@ -124,13 +128,12 @@ func GetSrc(uid int, num int) {
 		//获取所有items
 		var items []Item
 		items = append(items, res.Data.Items...)
-		// fmt.Println(items)
 		for _, v := range items {
+			//清除上次输出
+			// clear.ClearCmd()
 			//获取每一个picture
 			fmt.Println("正在读取第" + strconv.Itoa(index) + "个相册,共" + strconv.Itoa(num) + "个相册")
-
 			for k, v1 := range v.Pictures {
-
 				//开始写入图片
 				//获取图片的后缀,并更改名字重新保存
 				dot := strings.LastIndex(v1.ImgSrc, ".")
@@ -143,6 +146,8 @@ func GetSrc(uid int, num int) {
 				}
 				if !ok {
 					//读取图片原始二进制数据
+					//延迟防止封ip
+					time.Sleep(time.Second * 1)
 					bin, err := http.Get(v1.ImgSrc)
 					if err != nil {
 						panic("访问图片失败 >_<!")
@@ -161,13 +166,16 @@ func GetSrc(uid int, num int) {
 					if err != nil {
 						panic("文件写入失败 >_<!")
 					}
+					//清除前面的输出
+					clear.ClearCmd()
+
 					fmt.Println("正在下载第" + strconv.Itoa(index) + "个相册的第" + strconv.Itoa(k+1) + "个图片,共" + strconv.Itoa(len(v.Pictures)) + "个图片")
 				}
 			}
 			index++
 		}
 		fmt.Println("下载完成,马上退出 >_<~~")
-		time.Sleep(1*time.Second)
+		time.Sleep(time.Second * 1)
 	} else {
 		panic("相册详情解析失败了呢 >_<!")
 	}
@@ -193,12 +201,12 @@ func GetImgNum(uid int) int {
 
 	}
 	imgNum := num.Data.AllCount
-	fmt.Println("-----------------获取相册数量 start------------------")
+	// fmt.Println("-----------------获取相册数量 start------------------")
 	if imgNum > 300 {
-		fmt.Println("改up主的相册有点多,请稍等一下哦 >_<~~")
+		// fmt.Println("改up主的相册有点多,请稍等一下哦 >_<~~")
 	} else {
-		fmt.Println("-----------------获取相册数量 ing--------------------")
-		fmt.Println("-----------------获取相册 end-----------------------")
+		// fmt.Println("-----------------获取相册数量 ing--------------------")
+		// fmt.Println("-----------------获取/相册 end-----------------------")
 		fmt.Printf("共获取到该up主 %v 个相册 >_<~~\n", imgNum)
 	}
 	return imgNum
